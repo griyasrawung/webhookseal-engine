@@ -1,3 +1,3 @@
 [submodule "webhookseal-providers"]
 	path = webhookseal-providers
-	url = C:\\Users\\User\\Documents\\Code\\webhookseal\\webhookseal-providers
+	url = https://github.com/griyasrawung/webhookseal-providers.git

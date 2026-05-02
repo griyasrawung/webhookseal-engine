@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/webhookseal/webhookseal-engine/internal/fixtures"
+	"github.com/griyasrawung/webhookseal-engine/internal/fixtures"
 )
 
 // fixedClock returns a fixed time for fixture testing.

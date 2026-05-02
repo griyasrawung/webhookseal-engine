@@ -3,7 +3,7 @@ package payload
 import (
 	"testing"
 
-	"github.com/webhookseal/webhookseal-engine/internal/specs"
+	"github.com/griyasrawung/webhookseal-engine/internal/specs"
 )
 
 func TestSortedParams(t *testing.T) {

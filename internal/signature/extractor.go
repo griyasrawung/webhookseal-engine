@@ -6,8 +6,8 @@ import (
 	"regexp"
 	"strings"
 
-	"github.com/webhookseal/webhookseal-engine/internal/hmac"
-	"github.com/webhookseal/webhookseal-engine/internal/specs"
+	"github.com/griyasrawung/webhookseal-engine/internal/hmac"
+	"github.com/griyasrawung/webhookseal-engine/internal/specs"
 )
 
 var (

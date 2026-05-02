@@ -5,7 +5,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/webhookseal/webhookseal-engine/internal/specs"
+	"github.com/griyasrawung/webhookseal-engine/internal/specs"
 )
 
 func TestDefaultConfig(t *testing.T) {

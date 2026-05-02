@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/webhookseal/webhookseal-engine/internal/specs"
+	"github.com/griyasrawung/webhookseal-engine/internal/specs"
 )
 
 // Input contains all data needed to construct a payload

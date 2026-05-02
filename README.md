@@ -13,13 +13,13 @@ This repository includes `webhookseal-providers` as a git submodule. That submod
 ## Install
 
 ```bash
-go get github.com/webhookseal/webhookseal-engine
+go get github.com/griyasrawung/webhookseal-engine
 ```
 
 ## Import
 
 ```go
-import "github.com/webhookseal/webhookseal-engine"
+import webhookseal "github.com/griyasrawung/webhookseal-engine/pkg/webhookseal"
 ```
 
 ## Quick start, `Verify()`
@@ -33,7 +33,7 @@ import (
 	"context"
 	"errors"
 
-	webhookseal "github.com/webhookseal/webhookseal-engine"
+	webhookseal "github.com/griyasrawung/webhookseal-engine/pkg/webhookseal"
 )
 
 func verifySimple(body []byte, headers map[string]string, secret string) error {
@@ -71,7 +71,7 @@ import (
 	"context"
 	"fmt"
 
-	webhookseal "github.com/webhookseal/webhookseal-engine"
+	webhookseal "github.com/griyasrawung/webhookseal-engine/pkg/webhookseal"
 )
 
 func verifyDetailed(body []byte, headers map[string]string, secret string, eventID string) error {
@@ -126,7 +126,7 @@ import (
 	"sync"
 	"time"
 
-	webhookseal "github.com/webhookseal/webhookseal-engine"
+	webhookseal "github.com/griyasrawung/webhookseal-engine/pkg/webhookseal"
 )
 
 type memoryReplayStore struct {
@@ -185,8 +185,9 @@ Provider support comes from embedded specs generated from `webhookseal-providers
 | --- | --- | --- |
 | github | Generated provider spec | Uses provider spec signature and timestamp rules |
 | stripe | Generated provider spec | Uses provider spec signature and timestamp rules |
+| shopify | Generated provider spec | Uses provider spec signature and timestamp rules |
 | slack | Generated provider spec | Uses provider spec signature and timestamp rules |
-| sendgrid | Generated provider spec | Uses provider spec signature and timestamp rules |
+| twilio | Generated provider spec | Uses provider spec signature and timestamp rules |
 
 Actual provider list depends on currently embedded generated specs.
 
@@ -195,6 +196,8 @@ Actual provider list depends on currently embedded generated specs.
 Returned errors wrap sentinel values and are compatible with `errors.Is`.
 
 ```go
+import "errors"
+
 if err != nil {
 	switch {
 	case errors.Is(err, webhookseal.ErrMissingSignature):

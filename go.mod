@@ -1,4 +1,4 @@
-module github.com/webhookseal/webhookseal-engine
+module github.com/griyasrawung/webhookseal-engine
 
 go 1.22
 

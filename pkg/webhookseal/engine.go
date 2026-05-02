@@ -6,11 +6,11 @@ import (
 	"strings"
 	"time"
 
-	internalhmac "github.com/webhookseal/webhookseal-engine/internal/hmac"
-	"github.com/webhookseal/webhookseal-engine/internal/payload"
-	"github.com/webhookseal/webhookseal-engine/internal/signature"
-	"github.com/webhookseal/webhookseal-engine/internal/specs"
-	"github.com/webhookseal/webhookseal-engine/internal/timestamp"
+	internalhmac "github.com/griyasrawung/webhookseal-engine/internal/hmac"
+	"github.com/griyasrawung/webhookseal-engine/internal/payload"
+	"github.com/griyasrawung/webhookseal-engine/internal/signature"
+	"github.com/griyasrawung/webhookseal-engine/internal/specs"
+	"github.com/griyasrawung/webhookseal-engine/internal/timestamp"
 )
 
 // Engine verifies webhook signatures using provider specifications.

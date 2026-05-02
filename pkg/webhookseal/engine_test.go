@@ -5,7 +5,7 @@ import (
 	"errors"
 	"testing"
 
-	internalhmac "github.com/webhookseal/webhookseal-engine/internal/hmac"
+	internalhmac "github.com/griyasrawung/webhookseal-engine/internal/hmac"
 )
 
 func TestVerifyGitHubValid(t *testing.T) {

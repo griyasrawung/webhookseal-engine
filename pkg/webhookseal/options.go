@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/webhookseal/webhookseal-engine/internal/specs"
+	"github.com/griyasrawung/webhookseal-engine/internal/specs"
 )
 
 // Option configures the webhook verification engine.

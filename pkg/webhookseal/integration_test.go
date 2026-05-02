@@ -7,7 +7,7 @@ import (
 	"testing"
 	"time"
 
-	"github.com/webhookseal/webhookseal-engine/internal/replay"
+	"github.com/griyasrawung/webhookseal-engine/internal/replay"
 )
 
 // TestNewLoadsAllProviders verifies that New() successfully loads all embedded provider specs.

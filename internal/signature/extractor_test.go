@@ -6,7 +6,7 @@ import (
 	"errors"
 	"testing"
 
-	"github.com/webhookseal/webhookseal-engine/internal/specs"
+	"github.com/griyasrawung/webhookseal-engine/internal/specs"
 )
 
 func TestExtract_GitHub(t *testing.T) {
