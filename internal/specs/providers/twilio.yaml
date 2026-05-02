@@ -1,0 +1,20 @@
+spec_version: "1.0.0"
+provider_id: "twilio"
+display_name: "Twilio"
+algorithm: "hmac-sha1"
+signature_header: "X-Twilio-Signature"
+signature_prefix: null
+signature_encoding: "base64"
+timestamp_header: null
+timestamp_format: null
+timestamp_location: null
+payload_construction: "custom"
+payload_template: "{url}{sorted_params}"
+replay_window_seconds: null
+multiple_signatures: false
+source_docs:
+  - url: "https://www.twilio.com/docs/usage/webhooks/webhooks-security"
+    retrieved_date: "2026-05-02"
+notes: "Twilio signs request URL concatenated with sorted form/query parameters using HMAC-SHA1 and base64 output."
+extensions:
+  canonicalization: "Sort parameter keys lexicographically and append key+value with no separators."

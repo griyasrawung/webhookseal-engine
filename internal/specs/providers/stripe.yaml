@@ -1,0 +1,20 @@
+spec_version: "1.0.0"
+provider_id: "stripe"
+display_name: "Stripe"
+algorithm: "hmac-sha256"
+signature_header: "Stripe-Signature"
+signature_prefix: "v1="
+signature_encoding: "hex"
+timestamp_header: null
+timestamp_format: "epoch_seconds"
+timestamp_location: "embedded_in_signature"
+payload_construction: "custom"
+payload_template: "{timestamp}.{body}"
+replay_window_seconds: 300
+signature_parse_pattern: "v1=([a-f0-9]+)"
+timestamp_parse_pattern: "t=(\\d+)"
+multiple_signatures: true
+source_docs:
+  - url: "https://docs.stripe.com/webhooks/signatures"
+    retrieved_date: "2026-05-02"
+notes: "Header format is 't=<epoch>,v1=<hex>[,v1=<hex>...]'. Multiple v1 values may be present during secret rotation - accept if ANY match. Use raw body bytes exactly as received; any JSON re-serialization breaks verification. CLI-forwarded events use a different endpoint secret than Dashboard endpoints."

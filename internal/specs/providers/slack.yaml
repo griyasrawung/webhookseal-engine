@@ -1,0 +1,18 @@
+spec_version: "1.0.0"
+provider_id: "slack"
+display_name: "Slack"
+algorithm: "hmac-sha256"
+signature_header: "X-Slack-Signature"
+signature_prefix: "v0="
+signature_encoding: "hex"
+timestamp_header: "X-Slack-Request-Timestamp"
+timestamp_format: "epoch_seconds"
+timestamp_location: "separate_header"
+payload_construction: "custom"
+payload_template: "v0:{timestamp}:{body}"
+replay_window_seconds: 300
+multiple_signatures: false
+source_docs:
+  - url: "https://api.slack.com/authentication/verifying-requests-from-slack"
+    retrieved_date: "2026-05-02"
+notes: "Slack signs v0:<timestamp>:<raw_body> using HMAC-SHA256. Reject requests outside replay window."

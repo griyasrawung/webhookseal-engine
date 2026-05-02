@@ -1,0 +1,22 @@
+spec_version: "1.0.0"
+provider_id: "github"
+display_name: "GitHub"
+algorithm: "hmac-sha256"
+signature_header: "X-Hub-Signature-256"
+signature_prefix: "sha256="
+signature_encoding: "hex"
+timestamp_header: null
+timestamp_format: null
+timestamp_location: null
+payload_construction: "raw_body"
+payload_template: null
+replay_window_seconds: null
+multiple_signatures: false
+extra_headers:
+  - "X-GitHub-Delivery"
+  - "X-GitHub-Event"
+  - "X-GitHub-Hook-ID"
+source_docs:
+  - url: "https://docs.github.com/en/webhooks/using-webhooks/validating-webhook-deliveries"
+    retrieved_date: "2026-05-02"
+notes: "GitHub signs raw request body using HMAC-SHA256 and sends hex digest as sha256=<hex>. No timestamp or replay window is provided by GitHub webhook signatures."

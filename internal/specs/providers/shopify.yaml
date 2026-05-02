@@ -1,0 +1,23 @@
+spec_version: "1.0.0"
+provider_id: "shopify"
+display_name: "Shopify"
+algorithm: "hmac-sha256"
+signature_header: "X-Shopify-Hmac-Sha256"
+signature_prefix: null
+signature_encoding: "base64"
+timestamp_header: null
+timestamp_format: null
+timestamp_location: null
+payload_construction: "raw_body"
+payload_template: null
+replay_window_seconds: null
+multiple_signatures: false
+extra_headers:
+  - "X-Shopify-Topic"
+  - "X-Shopify-Shop-Domain"
+  - "X-Shopify-Triggered-At"
+  - "X-Shopify-Webhook-Id"
+source_docs:
+  - url: "https://shopify.dev/docs/apps/build/webhooks/subscribe/https"
+    retrieved_date: "2026-05-02"
+notes: "Shopify computes HMAC-SHA256 over raw body bytes and sends base64 digest in X-Shopify-Hmac-Sha256."
