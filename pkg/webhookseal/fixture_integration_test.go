@@ -34,7 +34,7 @@ func TestProviderFixtures(t *testing.T) {
 	totalPassed := 0
 
 	for _, provider := range providers {
-		fixturePath := filepath.Join("internal", "fixtures", "providers", provider+".fixtures.json")
+		fixturePath := filepath.Join("..", "..", "internal", "fixtures", "providers", provider+".fixtures.json")
 		providerFixtures, err := fixtures.LoadProviderFixtures(fixturePath)
 		if err != nil {
 			t.Fatalf("LoadProviderFixtures(%q) failed: %v", provider, err)
