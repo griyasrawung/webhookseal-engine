@@ -51,11 +51,13 @@ go test ./...
 ## Troubleshooting
 
 If provider is reported unknown:
+
 - Confirm provider exists in submodule definitions.
 - Re-run `make generate`.
 - Confirm generated artifacts are present in working tree.
 
 If signatures suddenly fail after refresh:
+
 - Confirm upstream provider spec change details.
 - Re-check local integration fixtures.
 - Validate headers and canonical payload inputs used by your caller.
