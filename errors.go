@@ -56,9 +56,9 @@ type VerificationError struct {
 // Error implements the error interface
 func (e *VerificationError) Error() string {
 	if e.Provider != "" {
-		return fmt.Sprintf("[%s] %s: %s", e.Provider, e.Code, e.Message)
+		return fmt.Sprintf("code=%s provider=%s message=%s", e.Code, e.Provider, e.Message)
 	}
-	return fmt.Sprintf("%s: %s", e.Code, e.Message)
+	return fmt.Sprintf("code=%s provider= message=%s", e.Code, e.Message)
 }
 
 // Unwrap returns the underlying cause for errors.Is compatibility
@@ -91,6 +91,27 @@ func NewVerificationError(code, provider, message, hint string) *VerificationErr
 		Provider: provider,
 		Message:  message,
 		Hint:     hint,
+		Cause:    sentinel,
+	}
+}
+
+// errorFor creates a VerificationError from code, provider, and cause
+func errorFor(code, provider string, cause error) *VerificationError {
+	sentinel, ok := CodeToSentinel[code]
+	if !ok {
+		sentinel = cause
+	}
+
+	message := ""
+	if cause != nil {
+		message = cause.Error()
+	}
+
+	return &VerificationError{
+		Code:     code,
+		Provider: provider,
+		Message:  message,
+		Hint:     "",
 		Cause:    sentinel,
 	}
 }

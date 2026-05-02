@@ -152,7 +152,7 @@ func TestCodeToSentinel(t *testing.T) {
 	}
 }
 
-func TestVerificationErrorWrapping(t *testing.T) {
+func TestVerificationErrorUnwrap(t *testing.T) {
 	// Test that wrapped errors preserve sentinel identity through multiple layers
 	err := NewVerificationError("ERR_BAD_SIGNATURE", "github", "test", "hint")
 	wrapped := &VerificationError{
@@ -166,6 +166,22 @@ func TestVerificationErrorWrapping(t *testing.T) {
 	// Should be able to detect the original sentinel through wrapping
 	if !errors.Is(wrapped, ErrBadSignature) {
 		t.Error("errors.Is() failed to detect sentinel through wrapping")
+	}
+}
+
+func TestErrorForHelper(t *testing.T) {
+	err := errorFor("ERR_BAD_SIGNATURE", "github", ErrBadSignature)
+	if err == nil {
+		t.Fatal("errorFor returned nil")
+	}
+	if err.Code != "ERR_BAD_SIGNATURE" {
+		t.Errorf("Code = %q, want %q", err.Code, "ERR_BAD_SIGNATURE")
+	}
+	if err.Provider != "github" {
+		t.Errorf("Provider = %q, want %q", err.Provider, "github")
+	}
+	if !errors.Is(err, ErrBadSignature) {
+		t.Error("errors.Is() should match sentinel from helper")
 	}
 }
 
@@ -183,7 +199,7 @@ func TestVerificationErrorFormatting(t *testing.T) {
 				Message:  "signature mismatch",
 				Cause:    ErrBadSignature,
 			},
-			contains: []string{"github", "ERR_BAD_SIGNATURE", "signature mismatch"},
+			contains: []string{"github", "ERR_BAD_SIGNATURE", "signature mismatch", "code=", "provider=", "message="},
 		},
 		{
 			name: "without provider",
@@ -193,7 +209,7 @@ func TestVerificationErrorFormatting(t *testing.T) {
 				Message:  "failed to load",
 				Cause:    ErrSpecLoad,
 			},
-			contains: []string{"ERR_SPEC_LOAD", "failed to load"},
+			contains: []string{"ERR_SPEC_LOAD", "failed to load", "code=", "provider=", "message="},
 		},
 	}
 
