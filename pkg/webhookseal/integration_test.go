@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"sync"
+	"sync/atomic"
 	"testing"
 	"time"
 
@@ -331,6 +333,152 @@ func TestWithToleranceOverride(t *testing.T) {
 	// Should be timestamp expiry error
 	if !errors.Is(err, ErrTimestampExpired) {
 		t.Errorf("expected ErrTimestampExpired, got %v", err)
+	}
+}
+
+func TestEngineExplicitScenariosD5(t *testing.T) {
+	t.Run("valid signature", func(t *testing.T) {
+		engine, err := New()
+		if err != nil {
+			t.Fatalf("New failed: %v", err)
+		}
+		payload := []byte(`{"zen":"Keep it logically awesome."}`)
+		secret := "github-webhook-secret"
+		sig := mustSignature(t, "hmac-sha256", "hex", secret, payload)
+		headers := map[string]string{"X-Hub-Signature-256": "sha256=" + sig}
+		if err := engine.Verify(context.Background(), "github", payload, headers, secret); err != nil {
+			t.Fatalf("Verify failed: %v", err)
+		}
+	})
+
+	t.Run("tampered body", func(t *testing.T) {
+		engine, _ := New()
+		original := []byte(`{"order_id":123,"total":"10.00"}`)
+		tampered := []byte(`{"order_id": 123, "total": "10.00"}`)
+		secret := "shopify-edge-secret"
+		sig := mustSignature(t, "hmac-sha256", "base64", secret, original)
+		headers := map[string]string{"X-Shopify-Hmac-Sha256": sig}
+		_, err := engine.VerifyFull(context.Background(), "shopify", tampered, headers, secret)
+		if !errors.Is(err, ErrBadSignature) {
+			t.Fatalf("expected ErrBadSignature, got %v", err)
+		}
+	})
+
+	t.Run("expired timestamp", func(t *testing.T) {
+		now := time.Unix(1714600000, 0)
+		expired := now.Add(-10 * time.Minute)
+		engine, _ := New(WithClock(fixedClock{t: now}))
+		body := []byte(`{"id":"evt_expired","object":"event"}`)
+		secret := "whsec_edge_expired"
+		signedPayload := []byte(fmt.Sprintf("%d.%s", expired.Unix(), body))
+		sig := mustSignature(t, "hmac-sha256", "hex", secret, signedPayload)
+		headers := map[string]string{"Stripe-Signature": fmt.Sprintf("t=%d,v1=%s", expired.Unix(), sig)}
+		_, err := engine.VerifyFull(context.Background(), "stripe", body, headers, secret)
+		if !errors.Is(err, ErrTimestampExpired) {
+			t.Fatalf("expected ErrTimestampExpired, got %v", err)
+		}
+	})
+
+	t.Run("replayed ID/nonce via WithReplayID", func(t *testing.T) {
+		store := replay.NewMemoryStore()
+		now := time.Unix(1714600000, 0)
+		engine, _ := New(WithReplayStore(store), WithClock(fixedClock{t: now}), WithTolerance("stripe", 5*time.Minute))
+		timestamp := now.Unix()
+		payload := []byte(`{"id":"evt_replay","object":"event"}`)
+		secret := "whsec_replay_test"
+		signedPayload := []byte(fmt.Sprintf("%d.%s", timestamp, payload))
+		sig := mustSignature(t, "hmac-sha256", "hex", secret, signedPayload)
+		headers := map[string]string{"Stripe-Signature": fmt.Sprintf("t=%d,v1=%s", timestamp, sig)}
+		replayID := "evt_unique_12345"
+		if _, err := engine.VerifyFull(context.Background(), "stripe", payload, headers, secret, WithReplayID(replayID)); err != nil {
+			t.Fatalf("first verify failed: %v", err)
+		}
+		_, err := engine.VerifyFull(context.Background(), "stripe", payload, headers, secret, WithReplayID(replayID))
+		if !errors.Is(err, ErrReplayDetected) {
+			t.Fatalf("expected ErrReplayDetected, got %v", err)
+		}
+	})
+
+	t.Run("wrong secret", func(t *testing.T) {
+		engine, _ := New()
+		payload := []byte(`{"action":"opened"}`)
+		sig := mustSignature(t, "hmac-sha256", "hex", "correct-secret", payload)
+		headers := map[string]string{"X-Hub-Signature-256": "sha256=" + sig}
+		_, err := engine.VerifyFull(context.Background(), "github", payload, headers, "wrong-secret")
+		if !errors.Is(err, ErrBadSignature) {
+			t.Fatalf("expected ErrBadSignature, got %v", err)
+		}
+	})
+
+	t.Run("missing signature header", func(t *testing.T) {
+		engine, _ := New()
+		_, err := engine.VerifyFull(context.Background(), "github", []byte("{}"), map[string]string{}, "secret")
+		if !errors.Is(err, ErrMissingSignature) {
+			t.Fatalf("expected ErrMissingSignature, got %v", err)
+		}
+	})
+
+	t.Run("missing timestamp header", func(t *testing.T) {
+		engine, _ := New()
+		body := []byte(`token=edge&team_id=T123`)
+		secret := "slack-edge-secret"
+		sig := mustSignature(t, "hmac-sha256", "hex", secret, []byte("v0:1714600000:"+string(body)))
+		headers := map[string]string{"X-Slack-Signature": "v0=" + sig}
+		_, err := engine.VerifyFull(context.Background(), "slack", body, headers, secret)
+		if !errors.Is(err, ErrMissingTimestamp) {
+			t.Fatalf("expected ErrMissingTimestamp, got %v", err)
+		}
+	})
+
+	t.Run("malformed signature", func(t *testing.T) {
+		engine, _ := New()
+		body := []byte(`{"action":"opened"}`)
+		secret := "github-edge-secret"
+		sig := mustSignature(t, "hmac-sha256", "hex", secret, body)
+		headers := map[string]string{"X-Hub-Signature-256": sig}
+		if err := engine.Verify(context.Background(), "github", body, headers, secret); !errors.Is(err, ErrBadFormat) {
+			t.Fatalf("expected ErrBadFormat, got %v", err)
+		}
+	})
+}
+
+func TestReplayStoreConcurrentAtomicity(t *testing.T) {
+	store := replay.NewMemoryStore()
+	now := time.Unix(1714600000, 0)
+	engine, err := New(WithReplayStore(store), WithClock(fixedClock{t: now}), WithTolerance("stripe", 5*time.Minute))
+	if err != nil {
+		t.Fatalf("New() failed: %v", err)
+	}
+
+	timestamp := now.Unix()
+	payload := []byte(`{"id":"evt_replay","object":"event"}`)
+	secret := "whsec_replay_test"
+	signedPayload := []byte(fmt.Sprintf("%d.%s", timestamp, payload))
+	sig := mustSignature(t, "hmac-sha256", "hex", secret, signedPayload)
+	headers := map[string]string{"Stripe-Signature": fmt.Sprintf("t=%d,v1=%s", timestamp, sig)}
+	replayID := "evt_concurrent_once"
+
+	const workers = 32
+	var accepted int32
+	var wg sync.WaitGroup
+	wg.Add(workers)
+	for i := 0; i < workers; i++ {
+		go func() {
+			defer wg.Done()
+			_, callErr := engine.VerifyFull(context.Background(), "stripe", payload, headers, secret, WithReplayID(replayID))
+			if callErr == nil {
+				atomic.AddInt32(&accepted, 1)
+				return
+			}
+			if !errors.Is(callErr, ErrReplayDetected) {
+				t.Errorf("expected ErrReplayDetected for rejected concurrent call, got %v", callErr)
+			}
+		}()
+	}
+	wg.Wait()
+
+	if accepted != 1 {
+		t.Fatalf("expected exactly one accepted replay ID, got %d", accepted)
 	}
 }
 
