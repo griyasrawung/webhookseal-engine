@@ -177,6 +177,21 @@ make generate
 go test ./...
 ```
 
+## CI/local verification commands
+
+Run from `webhookseal-engine/`:
+
+```bash
+make generate
+go test ./... -v
+```
+
+Expected passing outcome:
+- `make generate` exits `0` with generated assets refreshed.
+- `go test ./... -v` exits `0` with package test summaries ending in `PASS`.
+
+CI additionally runs `go test ./... -v -race -coverprofile=coverage.txt`, but `-race` is not required for local verification in this environment.
+
 ## Supported providers
 
 Provider support comes from embedded specs generated from `webhookseal-providers`.
@@ -212,13 +227,32 @@ if err != nil {
 }
 ```
 
+## Open-core boundary and secret handling
+
+`webhookseal-engine` is an open verification library focused on provider-aware signature validation.
+
+What this repository includes:
+- Signature verification runtime.
+- Replay-detection interfaces.
+- Provider-spec consumption from open registry data.
+
+What this repository does not include:
+- Any proprietary/closed service deployment layer.
+- Secret storage/vault implementations.
+- Operational secret management workflows.
+
+Secret handling expectations:
+- Secrets are inputs at runtime and are not persisted by default by this library.
+- Replay/verification metadata should be handled without exposing raw secret values.
+- Production secret lifecycle concerns are outside this repository scope.
+
 ## Explicit non-goals
 
 `webhookseal-engine` does not include:
 
 - An API server or HTTP middleware stack
 - Concrete replay store implementations, like Redis or SQL drivers
-- Provider spec authoring workflows, those belong in `webhookseal-providers`
+- Provider spec authoring workflows (these are maintained in the provider registry repository)
 
 ## Additional docs
 
