@@ -1,0 +1,13 @@
+{
+  "provider_id": "github",
+  "cases": [
+    {"name":"valid_basic","secret":"gh_secret_alpha","headers":{"X-Hub-Signature-256":"sha256=0ef175a2f842a52c7efb0dfb8bbc7c59e24d0b9d635a74bee8c12d8188238e1b"},"body":"{\"action\":\"opened\",\"issue\":1}","url":"","params":{},"timestamp":0,"expected_error":null},
+    {"name":"valid_empty_body","secret":"gh_secret_beta","headers":{"X-Hub-Signature-256":"sha256=d37d09c3e592a1ce661435306d414c54fb8012c0a769e348237b1a079e1c6623"},"body":"","url":"","params":{},"timestamp":0,"expected_error":null},
+    {"name":"valid_text_payload","secret":"gh_secret_gamma","headers":{"X-Hub-Signature-256":"sha256=b1bc8af7995080fdb0ff6db21475367b8631c5f56f4f75bd999db14ca727fa76"},"body":"{\"zen\":\"Keep it logically awesome.\"}","url":"","params":{},"timestamp":0,"expected_error":null},
+    {"name":"missing_header","secret":"gh_secret_alpha","headers":{},"body":"{}","url":"","params":{},"timestamp":0,"expected_error":"ERR_MISSING_SIGNATURE"},
+    {"name":"wrong_prefix","secret":"gh_secret_alpha","headers":{"X-Hub-Signature-256":"0ef175a2f842a52c7efb0dfb8bbc7c59e24d0b9d635a74bee8c12d8188238e1b"},"body":"{\"action\":\"opened\",\"issue\":1}","url":"","params":{},"timestamp":0,"expected_error":"ERR_BAD_FORMAT"},
+    {"name":"bad_signature","secret":"gh_secret_alpha","headers":{"X-Hub-Signature-256":"sha256=deadbeef"},"body":"{\"action\":\"opened\",\"issue\":1}","url":"","params":{},"timestamp":0,"expected_error":"ERR_BAD_SIGNATURE"},
+    {"name":"uppercase_hex_mismatch","secret":"gh_secret_alpha","headers":{"X-Hub-Signature-256":"sha256=0EF175A2F842A52C7EFB0DFB8BBC7C59E24D0B9D635A74BEE8C12D8188238E1B"},"body":"{\"action\":\"opened\",\"issue\":1}","url":"","params":{},"timestamp":0,"expected_error":"ERR_BAD_SIGNATURE"},
+    {"name":"empty_value_bad_signature","secret":"gh_secret_alpha","headers":{"X-Hub-Signature-256":"sha256="},"body":"{}","url":"","params":{},"timestamp":0,"expected_error":"ERR_BAD_SIGNATURE"}
+  ]
+}

@@ -4,6 +4,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	"strings"
 )
 
 // Encode converts raw signature bytes to a supported textual encoding.
@@ -22,6 +23,10 @@ func Encode(raw []byte, encoding string) (string, error) {
 func Decode(encoded string, encoding string) ([]byte, error) {
 	switch encoding {
 	case "hex":
+		// Reject uppercase hex to enforce lowercase canonical form
+		if encoded != strings.ToLower(encoded) {
+			return nil, fmt.Errorf("decode hex signature: uppercase not allowed")
+		}
 		decoded, err := hex.DecodeString(encoded)
 		if err != nil {
 			return nil, fmt.Errorf("decode hex signature: %w", err)

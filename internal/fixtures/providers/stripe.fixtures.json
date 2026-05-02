@@ -1,0 +1,13 @@
+{
+  "provider_id": "stripe",
+  "cases": [
+    {"name":"valid_basic","secret":"whsec_test_alpha","headers":{"Stripe-Signature":"t=1714600000,v1=1ab39c37cea0de7b479bce6bf4e13860a10597632068ca0cb470367580905ea8"},"body":"{\"id\":\"evt_001\",\"object\":\"event\"}","url":"","params":{},"timestamp":1714600000,"expected_error":null},
+    {"name":"valid_multi_v1","secret":"whsec_test_beta","headers":{"Stripe-Signature":"t=1714600200,v1=deadbeef,v1=8454ed31a51a911ab66ee25df602952eb2ceab29e598dda722baed641ccecc74"},"body":"{\"id\":\"evt_002\",\"object\":\"event\"}","url":"","params":{},"timestamp":1714600200,"expected_error":null},
+    {"name":"valid_empty_body","secret":"whsec_test_gamma","headers":{"Stripe-Signature":"t=1714600300,v1=e7ac2e04589b259513601a5fb4d742bb6974b32017e670972e1cf3cdfdce784d"},"body":"","url":"","params":{},"timestamp":1714600300,"expected_error":null},
+    {"name":"missing_header","secret":"whsec_test_alpha","headers":{},"body":"{}","url":"","params":{},"timestamp":1714600000,"expected_error":"ERR_MISSING_SIGNATURE"},
+    {"name":"bad_format_no_timestamp","secret":"whsec_test_alpha","headers":{"Stripe-Signature":"v1=abcd"},"body":"{}","url":"","params":{},"timestamp":1714600000,"expected_error":"ERR_BAD_FORMAT"},
+    {"name":"expired_timestamp","secret":"whsec_test_alpha","headers":{"Stripe-Signature":"t=1714590000,v1=1415a404a23ad3bbde261ea4c4d99c0ce7a149bb1128205b5d3c615464880d38"},"body":"{}","url":"","params":{},"timestamp":1714600000,"expected_error":"ERR_TIMESTAMP_EXPIRED"},
+    {"name":"bad_signature","secret":"whsec_test_alpha","headers":{"Stripe-Signature":"t=1714600000,v1=deadbeef"},"body":"{}","url":"","params":{},"timestamp":1714600000,"expected_error":"ERR_BAD_SIGNATURE"},
+    {"name":"bad_format_non_numeric_timestamp","secret":"whsec_test_alpha","headers":{"Stripe-Signature":"t=abc,v1=deadbeef"},"body":"{}","url":"","params":{},"timestamp":1714600000,"expected_error":"ERR_BAD_FORMAT"}
+  ]
+}

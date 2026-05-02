@@ -1,0 +1,13 @@
+{
+  "provider_id": "shopify",
+  "cases": [
+    {"name":"valid_basic","secret":"shop_secret_alpha","headers":{"X-Shopify-Hmac-Sha256":"spyX7O3LlsibNQ0WWjALybNbLDkxC7yqyX+L/IWAz44="},"body":"{\"topic\":\"orders/create\",\"id\":1001}","url":"","params":{},"timestamp":0,"expected_error":null},
+    {"name":"valid_empty_body","secret":"shop_secret_beta","headers":{"X-Shopify-Hmac-Sha256":"i5Sgzbn86ae6xIv/uLlskj0raQS6w13PD2OxnpbSbwc="},"body":"","url":"","params":{},"timestamp":0,"expected_error":null},
+    {"name":"valid_multiline_body","secret":"shop_secret_gamma","headers":{"X-Shopify-Hmac-Sha256":"ShRvL+ZTxBWyyeYwFfuZA54+j7OvVM0hKJ2OCEXbE74="},"body":"line1\nline2","url":"","params":{},"timestamp":0,"expected_error":null},
+    {"name":"missing_header","secret":"shop_secret_alpha","headers":{},"body":"{}","url":"","params":{},"timestamp":0,"expected_error":"ERR_MISSING_SIGNATURE"},
+    {"name":"bad_base64_format","secret":"shop_secret_alpha","headers":{"X-Shopify-Hmac-Sha256":"***"},"body":"{}","url":"","params":{},"timestamp":0,"expected_error":"ERR_BAD_SIGNATURE"},
+    {"name":"bad_signature","secret":"shop_secret_alpha","headers":{"X-Shopify-Hmac-Sha256":"ZGVhZGJlZWY="},"body":"{\"topic\":\"orders/create\",\"id\":1001}","url":"","params":{},"timestamp":0,"expected_error":"ERR_BAD_SIGNATURE"},
+    {"name":"whitespace_changed_body","secret":"shop_secret_alpha","headers":{"X-Shopify-Hmac-Sha256":"spyX7O3LlsibNQ0WWjALybNbLDkxC7yqyX+L/IWAz44="},"body":"{ \"topic\": \"orders/create\", \"id\": 1001 }","url":"","params":{},"timestamp":0,"expected_error":"ERR_BAD_SIGNATURE"},
+    {"name":"empty_header_value","secret":"shop_secret_alpha","headers":{"X-Shopify-Hmac-Sha256":""},"body":"{}","url":"","params":{},"timestamp":0,"expected_error":"ERR_BAD_SIGNATURE"}
+  ]
+}

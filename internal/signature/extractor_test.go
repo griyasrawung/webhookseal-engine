@@ -229,19 +229,20 @@ func TestExtract_MissingSignature(t *testing.T) {
 	tests := []struct {
 		name    string
 		headers map[string]string
+		wantErr error
 	}{
-		{"nil headers", nil},
-		{"empty headers", map[string]string{}},
-		{"different header", map[string]string{"X-Other": "value"}},
-		{"empty value", map[string]string{"X-Signature": ""}},
-		{"whitespace only", map[string]string{"X-Signature": "   "}},
+		{"nil headers", nil, ErrMissingSignature},
+		{"empty headers", map[string]string{}, ErrMissingSignature},
+		{"different header", map[string]string{"X-Other": "value"}, ErrMissingSignature},
+		{"empty value", map[string]string{"X-Signature": ""}, ErrBadFormat},
+		{"whitespace only", map[string]string{"X-Signature": "   "}, ErrBadFormat},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			_, err := Extract(spec, tt.headers)
-			if !errors.Is(err, ErrMissingSignature) {
-				t.Errorf("expected ErrMissingSignature, got %v", err)
+			if !errors.Is(err, tt.wantErr) {
+				t.Errorf("expected %v, got %v", tt.wantErr, err)
 			}
 		})
 	}

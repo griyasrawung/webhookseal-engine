@@ -3,6 +3,7 @@ package webhookseal
 import (
 	"context"
 	"errors"
+	"strings"
 	"time"
 
 	internalhmac "github.com/webhookseal/webhookseal-engine/internal/hmac"
@@ -74,6 +75,12 @@ func (e *Engine) VerifyFull(ctx context.Context, provider string, body []byte, h
 		}
 	}
 
+	// Extract signature first to ensure missing signature takes precedence over missing timestamp
+	received, err := signature.Extract(spec, headers)
+	if err != nil {
+		return Result{Valid: false, Provider: provider, Algorithm: spec.Algorithm, Reason: err.Error()}, mapSignatureError(provider, err)
+	}
+
 	ts, tsValue, err := timestamp.Extract(spec, headers)
 	if err != nil {
 		return Result{Valid: false, Provider: provider, Algorithm: spec.Algorithm, Reason: err.Error()}, mapTimestampError(provider, err)
@@ -94,11 +101,6 @@ func (e *Engine) VerifyFull(ctx context.Context, provider string, body []byte, h
 	computed, err := internalhmac.Compute(spec.Algorithm, []byte(secret), builtPayload)
 	if err != nil {
 		return Result{Valid: false, Provider: provider, Timestamp: ts, Algorithm: spec.Algorithm, Reason: err.Error()}, errorFor("ERR_BAD_FORMAT", provider, err)
-	}
-
-	received, err := signature.Extract(spec, headers)
-	if err != nil {
-		return Result{Valid: false, Provider: provider, Timestamp: ts, Algorithm: spec.Algorithm, Reason: err.Error()}, mapSignatureError(provider, err)
 	}
 
 	matchedIndex := -1
@@ -151,9 +153,18 @@ func mapTimestampError(provider string, err error) error {
 }
 
 func mapSignatureError(provider string, err error) error {
+	if err == nil {
+		return nil
+	}
+
 	switch {
 	case errors.Is(err, signature.ErrMissingSignature):
 		return errorFor("ERR_MISSING_SIGNATURE", provider, err)
+	case errors.Is(err, signature.ErrBadFormat):
+		if strings.Contains(err.Error(), "empty signature") || strings.Contains(err.Error(), "uppercase not allowed") || strings.Contains(err.Error(), "decode base64 signature") {
+			return errorFor("ERR_BAD_SIGNATURE", provider, err)
+		}
+		return errorFor("ERR_BAD_FORMAT", provider, err)
 	default:
 		return errorFor("ERR_BAD_FORMAT", provider, err)
 	}

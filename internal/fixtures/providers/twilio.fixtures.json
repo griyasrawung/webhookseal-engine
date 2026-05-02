@@ -1,0 +1,13 @@
+{
+  "provider_id": "twilio",
+  "cases": [
+    {"name":"valid_basic","secret":"twilio_secret_alpha","headers":{"X-Twilio-Signature":"RwPCy6R5V/lqqVT/4CfvbfdpjBw="},"body":"","url":"https://example.com/twilio/webhook","params":{"CallSid":"CA123","From":"+14155550123"},"timestamp":0,"expected_error":null},
+    {"name":"valid_no_params","secret":"twilio_secret_beta","headers":{"X-Twilio-Signature":"yZ8RT1zpzJR8zsxZH4AMifsV3a4="},"body":"","url":"https://example.com/twilio/status","params":{},"timestamp":0,"expected_error":null},
+    {"name":"valid_sorted_params","secret":"twilio_secret_gamma","headers":{"X-Twilio-Signature":"5cLKfSwBj5oQjKtmS6kbm9Y4eKY="},"body":"","url":"https://example.com/twilio/webhook","params":{"B":"2","A":"1"},"timestamp":0,"expected_error":null},
+    {"name":"missing_header","secret":"twilio_secret_alpha","headers":{},"body":"","url":"https://example.com/twilio/webhook","params":{"CallSid":"CA123"},"timestamp":0,"expected_error":"ERR_MISSING_SIGNATURE"},
+    {"name":"bad_signature","secret":"twilio_secret_alpha","headers":{"X-Twilio-Signature":"ZGVhZA=="},"body":"","url":"https://example.com/twilio/webhook","params":{"CallSid":"CA123","From":"+14155550123"},"timestamp":0,"expected_error":"ERR_BAD_SIGNATURE"},
+    {"name":"url_changed","secret":"twilio_secret_alpha","headers":{"X-Twilio-Signature":"RwPCy6R5V/lqqVT/4CfvbfdpjBw="},"body":"","url":"https://example.com/twilio/webhook2","params":{"CallSid":"CA123","From":"+14155550123"},"timestamp":0,"expected_error":"ERR_BAD_SIGNATURE"},
+    {"name":"param_value_changed","secret":"twilio_secret_alpha","headers":{"X-Twilio-Signature":"RwPCy6R5V/lqqVT/4CfvbfdpjBw="},"body":"","url":"https://example.com/twilio/webhook","params":{"CallSid":"CA123","From":"+14155550124"},"timestamp":0,"expected_error":"ERR_BAD_SIGNATURE"},
+    {"name":"empty_header_value","secret":"twilio_secret_alpha","headers":{"X-Twilio-Signature":""},"body":"","url":"https://example.com/twilio/webhook","params":{"CallSid":"CA123"},"timestamp":0,"expected_error":"ERR_BAD_SIGNATURE"}
+  ]
+}

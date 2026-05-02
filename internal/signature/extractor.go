@@ -22,8 +22,11 @@ func Extract(spec *specs.ProviderSpec, headers map[string]string) ([][]byte, err
 	}
 
 	rawHeader, ok := getHeaderCaseInsensitive(headers, spec.SignatureHeader)
-	if !ok || strings.TrimSpace(rawHeader) == "" {
+	if !ok {
 		return nil, ErrMissingSignature
+	}
+	if strings.TrimSpace(rawHeader) == "" {
+		return nil, fmt.Errorf("%w: empty signature", ErrBadFormat)
 	}
 
 	encodedValues, err := extractEncodedValues(spec, rawHeader)

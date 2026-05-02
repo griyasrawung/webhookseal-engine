@@ -1,0 +1,13 @@
+{
+  "provider_id": "slack",
+  "cases": [
+    {"name":"valid_basic","secret":"slack_secret_alpha","headers":{"X-Slack-Signature":"v0=bf7f3b1af189839eb7ce8b02f2620fac188a3b45bb80af1d2dcaef14db918830","X-Slack-Request-Timestamp":"1714600100"},"body":"token=abc&team_id=T0001","url":"","params":{},"timestamp":1714600100,"expected_error":null},
+    {"name":"valid_empty_body","secret":"slack_secret_beta","headers":{"X-Slack-Signature":"v0=e422a7499f768527e8674ab00cab32200e83a545851b1bd785631be81a2a55aa","X-Slack-Request-Timestamp":"1714600150"},"body":"","url":"","params":{},"timestamp":1714600150,"expected_error":null},
+    {"name":"valid_encoded_payload","secret":"slack_secret_gamma","headers":{"X-Slack-Signature":"v0=c93871a0458fa26537bb318db1db9a7ee3f17d38472a02309d2340e3abb97886","X-Slack-Request-Timestamp":"1714600200"},"body":"payload=%7B%22a%22%3A1%7D","url":"","params":{},"timestamp":1714600200,"expected_error":null},
+    {"name":"missing_signature","secret":"slack_secret_alpha","headers":{"X-Slack-Request-Timestamp":"1714600100"},"body":"token=abc&team_id=T0001","url":"","params":{},"timestamp":1714600100,"expected_error":"ERR_MISSING_SIGNATURE"},
+    {"name":"missing_timestamp","secret":"slack_secret_alpha","headers":{"X-Slack-Signature":"v0=bf7f3b1af189839eb7ce8b02f2620fac188a3b45bb80af1d2dcaef14db918830"},"body":"token=abc&team_id=T0001","url":"","params":{},"timestamp":1714600100,"expected_error":"ERR_MISSING_TIMESTAMP"},
+    {"name":"expired_timestamp","secret":"slack_secret_alpha","headers":{"X-Slack-Signature":"v0=0f7bcf8e45b17dcf2a7f64495cd26c2cab6d0aa45115eb8512a251136f3e9e2e","X-Slack-Request-Timestamp":"1714590000"},"body":"token=abc&team_id=T0001","url":"","params":{},"timestamp":1714600100,"expected_error":"ERR_TIMESTAMP_EXPIRED"},
+    {"name":"bad_prefix","secret":"slack_secret_alpha","headers":{"X-Slack-Signature":"bf7f3b1af189839eb7ce8b02f2620fac188a3b45bb80af1d2dcaef14db918830","X-Slack-Request-Timestamp":"1714600100"},"body":"token=abc&team_id=T0001","url":"","params":{},"timestamp":1714600100,"expected_error":"ERR_BAD_FORMAT"},
+    {"name":"bad_signature","secret":"slack_secret_alpha","headers":{"X-Slack-Signature":"v0=deadbeef","X-Slack-Request-Timestamp":"1714600100"},"body":"token=abc&team_id=T0001","url":"","params":{},"timestamp":1714600100,"expected_error":"ERR_BAD_SIGNATURE"}
+  ]
+}
