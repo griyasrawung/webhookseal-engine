@@ -12,7 +12,7 @@ vet:
 	go vet ./...
 
 fixtures:
-	go test ./... -run TestProviderFixtures -v
+	go test ./pkg/webhookseal -run TestProviderFixtures -v
 
 clean-generated:
 	rm -f internal/specs/providers/*.yaml
